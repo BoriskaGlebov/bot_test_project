@@ -6,4 +6,5 @@ router = Router()
 
 @router.message(F.text)
 async def echo(message: Message):
+    """"Эхо Бот"""
     await message.reply(message.text)
