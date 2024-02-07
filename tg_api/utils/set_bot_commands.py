@@ -20,3 +20,13 @@ main_menu_commands = [
 async def set_main_menu(bot: Bot):
     """Создаем список с командами и их описанием для кнопки menu"""
     await bot.set_my_commands(main_menu_commands)
+
+
+async def set_discription(bot: Bot):
+    """Устанавливаю описание бота"""
+    inf = await bot.get_me()
+    await bot.set_my_description(f'{inf.first_name} приветствует тебя!\n'
+                                 f'Этот 🤖БОТ занимается поиском\n'
+                                 f'🍿👉 фильмов\n'
+                                 f'🍫👉 сериалов\n'
+                                 f'Сервиса Кинопоиск⭐️')
