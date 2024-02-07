@@ -14,7 +14,9 @@ async def start_cmd(message: Message, bot: Bot, state: FSMContext):
     """Действия бота по команде start"""
     user = message.from_user
     me = await bot.get_me()
+    mes = message
     await state.clear()
+    # await bot.delete_message(chat_id=mes.chat.id, message_id=mes.message_id,)
     # await asyncio.sleep(1.5)
     # await message.delete()
     await message.answer(f'Привет <b>{user.username}</b>!!!\n'
