@@ -70,5 +70,89 @@ class FilmsBase(peewee.Model):
         database = db
 
 
+class Top100Films(peewee.Model):
+    """Таблица для хранения топ 100 фильмов Кинопоиска"""
+    created_at = peewee.DateTimeField(default=datetime.now().strftime('%Y-%m-%d %X'))
+    film_id = peewee.IntegerField(null=True)
+    name = peewee.TextField(null=True)
+    alternativeName = peewee.TextField(null=True)
+    rating = JSONField(null=True, json_dumps=my_json_dumps)
+    movieLength = peewee.IntegerField(null=True)
+    description = peewee.TextField(null=True)
+    year = peewee.IntegerField(null=True)
+    poster = JSONField(null=True, json_dumps=my_json_dumps)
+    genres = JSONField(null=True, json_dumps=my_json_dumps)
+    networks = peewee.TextField(null=True)
+    videos = JSONField(null=True, json_dumps=my_json_dumps)
+
+    class Meta:
+        database = db
+
+
+class Find_Film_Param(peewee.Model):
+    """Таблица найденных фильмов по параметрам"""
+    created_at = peewee.DateTimeField(default=datetime.now().strftime('%Y-%m-%d %X'))
+    user = peewee.ForeignKeyField(User, backref='query')
+    query = peewee.TextField()
+    film_id = peewee.IntegerField(null=True)
+    name = peewee.TextField(null=True)
+    status = peewee.TextField(null=True)
+    externalId = JSONField(null=True, json_dumps=my_json_dumps)
+    rating = JSONField(null=True, json_dumps=my_json_dumps)
+    votes = JSONField(null=True, json_dumps=my_json_dumps)
+    backdrop = JSONField(null=True, json_dumps=my_json_dumps)
+    images = JSONField(null=True, json_dumps=my_json_dumps)
+    productionCompanies = JSONField(null=True, json_dumps=my_json_dumps)
+    spokenLanguages = JSONField(null=True, json_dumps=my_json_dumps)
+    type = peewee.TextField(null=True)
+    description = peewee.TextField(null=True)
+    distributors = JSONField(null=True, json_dumps=my_json_dumps)
+    premiere = JSONField(null=True, json_dumps=my_json_dumps)
+    slogan = peewee.TextField(null=True)
+    year = peewee.IntegerField(null=True)
+    poster = JSONField(null=True, json_dumps=my_json_dumps)
+    facts = JSONField(null=True, json_dumps=my_json_dumps)
+    genres = JSONField(null=True, json_dumps=my_json_dumps)
+    countries = JSONField(null=True, json_dumps=my_json_dumps)
+    seasonsInfo = JSONField(null=True, json_dumps=my_json_dumps)
+    persons = JSONField(null=True, json_dumps=my_json_dumps)
+    lists = JSONField(null=True, json_dumps=my_json_dumps)
+    typeNumber = peewee.IntegerField(null=True)
+    alternativeName = peewee.TextField(null=True)
+    enName = peewee.TextField(null=True)
+    names = JSONField(null=True, json_dumps=my_json_dumps)
+    budget = JSONField(null=True, json_dumps=my_json_dumps)
+    color = peewee.TextField(null=True)
+    movieLength = peewee.TextField(null=True)
+    networks = peewee.TextField(null=True)
+    shortDescription = peewee.TextField(null=True)
+    subType = peewee.TextField(null=True)
+    fees = JSONField(null=True, json_dumps=my_json_dumps)
+    updatedAt = peewee.TextField(null=True)
+    ratingMpaa = peewee.TextField(null=True)
+    technology = JSONField(null=True, json_dumps=my_json_dumps)
+    ticketsOnSale = peewee.IntegerField(null=True)
+    similarMovies = JSONField(null=True, json_dumps=my_json_dumps)
+    sequelsAndPrequels = JSONField(null=True, json_dumps=my_json_dumps)
+    ageRating = peewee.IntegerField(null=True)
+    logo = JSONField(null=True, json_dumps=my_json_dumps)
+    imagesInfo = JSONField(null=True, json_dumps=my_json_dumps)
+    watchability = JSONField(null=True, json_dumps=my_json_dumps)
+    releaseYears = JSONField(null=True, json_dumps=my_json_dumps)
+    top10 = peewee.TextField(null=True)
+    top250 = peewee.IntegerField(null=True)
+    deletedAt = peewee.TextField(null=True)
+    isSeries = peewee.IntegerField(null=True)
+    seriesLength = peewee.IntegerField(null=True)
+    totalSeriesLength = peewee.TextField(null=True)
+    videos = JSONField(null=True, json_dumps=my_json_dumps)
+    audience = JSONField(null=True, json_dumps=my_json_dumps)
+    collections = JSONField(null=True, json_dumps=my_json_dumps)
+    createdAt = JSONField(null=True, json_dumps=my_json_dumps)
+
+    class Meta:
+        database = db
+
+
 db.connect()
-db.create_tables([User, FilmsBase])
+db.create_tables([User, FilmsBase, Top100Films, Find_Film_Param])

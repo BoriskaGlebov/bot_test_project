@@ -4,8 +4,9 @@ from aiogram.types import Message, ReplyKeyboardRemove
 from tg_api.keyboards.reply.keybord_start import start_kb
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from database.core import def_insert_user, User
-from tg_api.states.user_state import MovieSearch
+from database.core import def_insert_user
+from database.models.models import User
+
 
 router = Router()
 

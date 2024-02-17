@@ -1,4 +1,4 @@
-from config_data.comfig import site_tg_settings
+from config_data.config import site_tg_settings
 
 headers_dict: dict = {
     "accept": site_tg_settings.host_api,
