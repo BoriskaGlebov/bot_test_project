@@ -10,7 +10,7 @@ else:
 
 
 class SiteSettings(BaseSettings):
-    """Базовые настройки"""
+    """Класс получения базовых настроек"""
     api_key: SecretStr = os.getenv('SITE_API')
     host_api: StrictStr = os.getenv('HOST_API')
     bot_key: SecretStr = os.getenv('BOT_TOKEN')
