@@ -42,7 +42,7 @@ async def film_types(callback: CallbackQuery, state: FSMContext, bot: Bot):
     action = callback.data.split('_')[1]
     if action == 'None':
         action = None
-    user_data[user_value] = [action, 2019, 2024, 0, 10, -1]
+    user_data[user_value] = [action, 2019, 2024, 0, 10, 0]
     await callback.answer(f'{callback.from_user.username} выбрал {action}')
     print(user_value, user_data)
     await bot.send_message(chat_id=callback.message.chat.id, text='Спасибо, переходим к следующему параметру')
@@ -224,7 +224,7 @@ async def genres_change(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer(text='Введите название страны', reply_markup=countries_kb())
         await state.set_state(MovieSearch.choosing_country)
         return
-    if 0 <= user_data[user_value][3] <= len(genres):
+    if -1 < user_data[user_value][3] <= len(genres):
         await edit_message_genres(callback.message, user_data[user_value][3])
     else:
         user_data[user_value][3] = value
@@ -240,6 +240,7 @@ async def countries_choice_callback(callback: CallbackQuery, state: FSMContext, 
     action = callback.data.split('_')[1]
     user_data[user_inf].append(None)
     print(user_data)
+    def_del_old_elem(db, user_inf, Find_Film_Param, User)
     await bot.send_message(chat_id=callback.message.chat.id, text='Вот все выбрали!')
     await bot.send_message(chat_id=callback.message.chat.id, text='Тип = {0}\n'
                                                                   'Год = {1}\n'
@@ -284,11 +285,14 @@ async def countries_choice_callback(callback: CallbackQuery, state: FSMContext, 
     await state.set_state(MovieSearch.changing_films_find_film_param)
 
 
-@router.message(MovieSearch.choosing_country, F.text.in_(countries))
+@router.message(MovieSearch.choosing_country, F.text.title().in_(countries))
 async def countries_choice(message: Message, state: FSMContext):
     """Обработка ввода страны"""
     user_value = message.from_user.id
-    user_data[user_value].append(message.text)
+    if message.text.upper() in ['США', 'СССР', 'ЦАР', 'ОАЭ']:
+        user_data[user_value].append(message.text.upper())
+    else:
+        user_data[user_value].append(message.text.title())
     await message.answer('Вот все и выбрали!')
     await message.answer(text='Тип = {0}\n'
                               'Год = {1}\n'

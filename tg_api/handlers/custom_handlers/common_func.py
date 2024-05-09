@@ -89,7 +89,7 @@ async def rez_finder(message: Message, state: FSMContext, new_state: State,
                 return
         elif st_name == 'MovieSearch:choosing_top_100':
             old_elem = def_del_old_elem(db, None, Top100Films, None)
-            if old_elem or len(Top100Films.select())==0:
+            if old_elem or len(Top100Films.select()) == 0:
                 response_list = def_top_100_film()
                 if isinstance(response_list, list) and len(response_list):
                     out_list = create_list_for_find_film(None, response_list, None)

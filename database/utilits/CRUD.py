@@ -52,6 +52,7 @@ def _del_instance(database: SqliteDatabase, user_id: int | None, model_film: T, 
             res = model_film.select().join(model_user).where(model_user.user_id == user_id,
                                                              model_film.created_at < datetime.now() - timedelta(
                                                                  minutes=15))
+            print(res)
             for el in res:
                 el.delete_instance()
     return res
