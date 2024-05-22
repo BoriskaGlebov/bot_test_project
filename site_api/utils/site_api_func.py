@@ -60,7 +60,7 @@ def _find_film_param(film_types: str | None = None, years: str | None = None,
     """
     url = 'https://api.kinopoisk.dev/v1.4/movie?'
     param = {'page': '1', 'limit': limit_page, 'selectFields': '',
-             'notNullFields': ['id', 'name', 'alternativeName', 'description', 'type', 'year']}
+             'notNullFields': ['id', 'name', 'alternativeName', 'description', 'type', 'year',]}
     keys = ['type', 'year', 'rating.kp', 'genres.name', 'countries.name']
     values = [film_types, years, rating_kp, genres, countries]
     param_user = {keys[num]: el for num, el in enumerate(values) if el is not None}
@@ -104,4 +104,5 @@ class SiteApiInterface:
 
 
 if __name__ == '__main__':
-    print('site_api')
+    res = _find_film_param()
+    print(res)

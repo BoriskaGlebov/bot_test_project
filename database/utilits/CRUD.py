@@ -80,3 +80,7 @@ class CRUDInterface:
     def del_olf_el(cls):
         """Удаление старых элементов в БД после определенного времени"""
         return _del_instance
+
+
+if __name__ == '__main__':
+    print('test')

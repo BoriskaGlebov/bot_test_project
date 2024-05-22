@@ -1,9 +1,12 @@
 import functools
+import os.path
 from datetime import datetime
 import peewee
 from playhouse.sqlite_ext import *
 
-db = peewee.SqliteDatabase('films.db')
+default_path = os.path.dirname(os.path.abspath(__file__)).split('bot')[0] + 'bot'
+db_path = os.path.join(default_path, 'films.db')
+db = peewee.SqliteDatabase(db_path, 'film.db')
 # Для отключения экранирования в таблицах
 my_json_dumps = functools.partial(json.dumps, ensure_ascii=False)
 
@@ -156,3 +159,7 @@ class Find_Film_Param(peewee.Model):
 
 db.connect()
 db.create_tables([User, FilmsBase, Top100Films, Find_Film_Param])
+if __name__ == '__main__':
+    print(default_path)
+    print(db_path)
+    # print(os.path.expanduser(__file__).split())

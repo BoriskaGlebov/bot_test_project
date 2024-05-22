@@ -9,4 +9,5 @@ def_del_old_elem = CRUDInterface.del_olf_el()
 
 if __name__ == '__main__':
     print('test')
-    def_del_old_elem(db, 439653349, Find_Film_Param, User)
+    def_insert_user(User, 456789, 'BOriska')
+    def_insert_user(User, 123, 'BOriska')

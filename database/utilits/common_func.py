@@ -1,3 +1,4 @@
+from pprint import pprint
 from typing import TypeVar
 from typing import Union, List, Dict
 from datetime import datetime
@@ -15,11 +16,11 @@ def create_list_for_find_film(user_inst: T | None, film_response: Union[List[Dic
     """
     out_list = []
     for num, elem in enumerate(film_response):
-        if elem['name'] and elem['description'] and elem['poster']['previewUrl']:
+        if elem.get('name') and elem.get('description') and elem.get('poster'):
             elem['created_at'] = datetime.now().strftime('%Y-%m-%d %X')
-            elem['film_id'] = elem.pop('id')
-            if query is not None and user_inst is not None:
-                elem['query'] = query
-                elem['user'] = user_inst
-            out_list.append(elem)
+        elem['film_id'] = elem.pop('id')
+        if query is not None and user_inst is not None:
+            elem['query'] = query
+            elem['user'] = user_inst
+        out_list.append(elem)
     return out_list
