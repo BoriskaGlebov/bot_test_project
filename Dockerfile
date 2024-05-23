@@ -1,11 +1,11 @@
 FROM python:3.12.0-slim
 
-COPY requirements.txt /app/
+COPY requirements.txt /bot/
 
-RUN pip install -r /app/requirements.txt
-#
-COPY . /app/
+RUN pip install -r /bot/requirements.txt
 
-WORKDIR /app
+COPY . /bot/
+
+WORKDIR /bot
 
 ENTRYPOINT ["python3","main.py"]
