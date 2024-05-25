@@ -1,11 +1,21 @@
+# Модуль основных функций с сайта Kinopoisk
+import logging
+from logging import config
+from config_data.logger_config import dict_config
+import os.path
 from typing import Dict, Any, Union, Callable, List, AnyStr
 from requests import get
 from site_api.settings.site_settings import headers_dict, status_code
 from site_api.utils.common_func import column_names
 
+logger = logging.getLogger('main.site_api.utils.' + str(os.path.relpath(__file__)))
+
+
+# logging.config.dictConfig(dict_config) #это на период тестирования
+
 
 # @column_names
-def _find_film(query_str: str, timeout: Any = 3, limit_page: int = 20, ) -> Union[List[Dict], AnyStr]:
+def _find_film(query_str: str, timeout: Any = 3, limit_page: int = 20, ) -> Union[List[Dict], AnyStr] | int:
     """
     Поиск фильма по названию и возвращает ответ в формате списка словарей с фильмами,
     так же может вернуть ключи словаря с типом данных пригодным для
@@ -19,15 +29,24 @@ def _find_film(query_str: str, timeout: Any = 3, limit_page: int = 20, ) -> Unio
     param = {'page': 1, 'limit': limit_page, 'query': query_str}
     response = get(url, params=param, headers=headers_dict, timeout=timeout)
     if response.status_code == 200:
-        print(status_code.get(response.status_code))
+        logger.debug(_find_film.__name__ + " " + status_code.get(response.status_code))
         return response.json()['docs']
     else:
-        return (f'Что-то пошло не так! '
-                f'Код = {response.status_code} = {status_code.get(response.status_code)}')
+        logger.error(f'{_find_film.__name__} Что-то пошло не так! '
+                     f'Код = {response.status_code} = {status_code.get(response.status_code)}')
+        return response.status_code
 
 
 # @column_names
-def _find_100_film(timeout: Any = 5, limit_page: int = 100, ) -> Union[Dict, str]:
+def _find_100_film(timeout: Any = 5, limit_page: int = 100, ) -> Union[Dict, str] | int:
+    """
+    Поиск топ 100 фильмов Кинопоискаи возвращает ответ в формате списка словарей с фильмами,
+    так же может вернуть ключи словаря с типом данных пригодным для
+    подготовки таблицы в БД
+    :param timeout: прерывание запроса через секунд
+    :param limit_page: количество выводимых фильмов
+    :return: ответ с сайта в формате json или код ошибки
+    """
     """Поиск топ 100 фильмов Кинопоиска"""
     url = 'https://api.kinopoisk.dev/v1.4/movie?'
     param = {'page': 1, 'limit': limit_page,
@@ -37,11 +56,12 @@ def _find_100_film(timeout: Any = 5, limit_page: int = 100, ) -> Union[Dict, str
              'sortField': 'rating.kp', 'sortType': '-1', 'lists': 'top250'}
     response = get(url, params=param, headers=headers_dict, timeout=timeout)
     if response.status_code == 200:
-        print(status_code.get(response.status_code))
+        logger.debug(_find_100_film.__name__ + " " + status_code.get(response.status_code))
         return response.json()['docs']
     else:
-        return (f'Что-то пошло не так! '
-                f'Код = {response.status_code} = {status_code.get(response.status_code)}')
+        logger.error(f'{_find_100_film.__name__} Что-то пошло не так! '
+                     f'Код = {response.status_code} = {status_code.get(response.status_code)}')
+        return response.status_code
 
 
 # @column_names
@@ -49,7 +69,20 @@ def _find_film_param(film_types: str | None = None, years: str | None = None,
                      rating_kp: str | None = None, genres: str | None = None,
                      countries: str | None = None,
                      limit_page: int = 20,
-                     timeout: Any = 10, ) -> Union[Dict, str]:
+                     timeout: Any = 10, ) -> Union[Dict, str] | int:
+    """
+    Поиск фильмов и сериалов по параметрам Кинопоиска возвращает ответ в формате списка словарей с фильмами,
+    так же может вернуть ключи словаря с типом данных пригодным для
+    подготовки таблицы в БД
+    :param film_types: movie,tv-series,cartoon,animated-series,anime или !anime
+    :param years: 1874, 2050, !2020, 2020-2024
+    :param rating_kp: 7, 10, 7.2-10
+    :param genres: "драма", "комедия", "!мелодрама", "+ужасы"
+    :param countries: "США", "Россия", "!Франция" , "+Великобритания"
+    :param limit_page: количество выводимых фильмов
+    :param timeout: прерывание запроса через секунд
+    :return: ответ с сайта в формате json или код ошибки
+    """
     """Поиск фильмов и сериалов по параметрам Кинопоиска
         :param film_types-movie,tv-series,cartoon,animated-series,anime или !anime
         :param years-1874, 2050, !2020, 2020-2024
@@ -60,18 +93,19 @@ def _find_film_param(film_types: str | None = None, years: str | None = None,
     """
     url = 'https://api.kinopoisk.dev/v1.4/movie?'
     param = {'page': '1', 'limit': limit_page, 'selectFields': '',
-             'notNullFields': ['id', 'name', 'alternativeName', 'description', 'type', 'year',]}
+             'notNullFields': ['id', 'name', 'alternativeName', 'description', 'type', 'year', ]}
     keys = ['type', 'year', 'rating.kp', 'genres.name', 'countries.name']
     values = [film_types, years, rating_kp, genres, countries]
     param_user = {keys[num]: el for num, el in enumerate(values) if el is not None}
     param.update(param_user)
     response = get(url, params=param, headers=headers_dict, timeout=timeout)
     if response.status_code == 200:
-        print(status_code.get(response.status_code))
+        logger.debug(_find_film_param.__name__ + " " + status_code.get(response.status_code))
         return response.json()['docs']
     else:
-        return (f'Что-то пошло не так! '
-                f'Код = {response.status_code} = {status_code.get(response.status_code)}')
+        logger.error(f'{_find_film_param.__name__} Что-то пошло не так! '
+                     f'Код = {response.status_code} = {status_code.get(response.status_code)}')
+        return response.status_code
 
 
 class SiteApiInterface:
@@ -81,28 +115,37 @@ class SiteApiInterface:
 
     @classmethod
     def film_finder(cls) -> Callable:
-        """Ищет фильм по названию и записывает в словарь json"""
+        """
+        Возвращает функцию _find_film
+        :return: функция
+        """
         return _find_film
 
     @classmethod
-    def top_100_film(cls):
-        """Поиск топ 100 фильмов Кинопоиска"""
+    def top_100_film(cls) -> Callable:
+        """
+        Возвращает функцию _find_100_film
+        :return: функция
+        """
         return _find_100_film
 
     @classmethod
-    def find_film_param(cls):
+    def find_film_param(cls) -> Callable:
         """
-        Поиск фильмов и сериалов по параметрам Кинопоиска
-        fields-можно оставить пустым, это какие поля не должны быть пустыми
-        film_types-movie,tv-series,cartoon,animated-series,anime или !anime
-        years-1874, 2050, !2020, 2020-2024
-        rating_kp-7, 10, 7.2-10
-        genres-"драма", "комедия", "!мелодрама", "+ужасы"
-        countries-"США", "Россия", "!Франция" , "+Великобритания"
+        Возвращает функцию _find_film_param
+        :return: функция
         """
         return _find_film_param
 
 
 if __name__ == '__main__':
-    res = _find_film_param()
+    # headers_dict = {}
+    # res = _find_film('dfksljg;gsj;g')
+    # print(res)
+
+    # res2 = _find_100_film()
+    # print(res2)
+    # #
+    res = _find_film_param('mov')
     print(res)
+    pass

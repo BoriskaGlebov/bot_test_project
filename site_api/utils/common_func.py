@@ -1,3 +1,4 @@
+# модуль необходим в начале проекта для создания колонок в БД
 from typing import Callable
 from functools import wraps
 
@@ -20,6 +21,7 @@ def column_names(func: Callable) -> Callable:
                 else:
                     file.write(f'{key} = JSONField(null=True, json_dumps=my_json_dumps)\n')
             file.write(f'Всего элементов = {str(len(some_res[0]))}')
+
         return some_res
 
     return wrap_func

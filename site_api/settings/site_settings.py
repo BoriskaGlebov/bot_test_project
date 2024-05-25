@@ -1,3 +1,4 @@
+# Модуль для headers в запросах
 from config_data.config import site_tg_settings
 
 headers_dict: dict = {
