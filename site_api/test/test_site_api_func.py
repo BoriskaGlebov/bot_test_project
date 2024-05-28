@@ -1,5 +1,10 @@
 import unittest
 from site_api.utils.site_api_func import SiteApiInterface
+import logging
+#отключаю логгирование на момент тестов
+logger = logging.getLogger(__name__)
+logging.disable(level="ERROR")
+
 
 
 class SiteApiInterfaceTest(unittest.TestCase):
@@ -43,5 +48,4 @@ class SiteApiInterfaceTest(unittest.TestCase):
         for i in SiteApiInterfaceTest.params_uncorrect:
             with self.subTest('Под тест'):
                 res = SiteApiInterfaceTest.film_param(*i)
-                print(res)
                 self.assertEqual(res, 400)
