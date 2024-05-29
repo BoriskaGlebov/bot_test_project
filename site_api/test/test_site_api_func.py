@@ -1,10 +1,10 @@
 import unittest
 from site_api.utils.site_api_func import SiteApiInterface
 import logging
-#отключаю логгирование на момент тестов
-logger = logging.getLogger(__name__)
-logging.disable(level="ERROR")
 
+# отключаю логгирование на момент тестов
+logger = logging.getLogger(__name__)
+logging.disable(level=40)  # level = ERROR
 
 
 class SiteApiInterfaceTest(unittest.TestCase):

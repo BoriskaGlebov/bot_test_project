@@ -1,7 +1,8 @@
 # Модуль основных функций с сайта Kinopoisk
 import logging
+import sys
 from logging import config
-from config_data.logger_config import dict_config
+from config_data.logger_config import *
 import os.path
 from typing import Dict, Any, Union, Callable, List, AnyStr
 from requests import get
@@ -9,6 +10,8 @@ from site_api.settings.site_settings import headers_dict, status_code
 from site_api.utils.common_func import column_names
 
 logger = logging.getLogger('main.site_api.utils.' + str(os.path.relpath(__file__)))
+sys.excepthook = any_exeption
+
 
 # logging.config.dictConfig(dict_config)  # это на период тестирования
 
@@ -139,7 +142,7 @@ if __name__ == '__main__':
     res = _find_film('1+1')
     # print(res)
 
-    res2 = _find_100_film()
+    res2 = _find_100_fil()
     # print(res2)
     # #
     res3 = _find_film_param('movie')

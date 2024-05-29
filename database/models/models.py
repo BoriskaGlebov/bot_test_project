@@ -1,8 +1,23 @@
+# Модуль описывает таблицы БД
 import functools
 import os.path
+import sys
 from datetime import datetime
 import peewee
 from playhouse.sqlite_ext import *
+
+import logging
+from config_data.logger_config import *
+
+
+def correct_date():
+    """
+    Функция определяет корректное время добавляемое в таблицы БД по умолчанию
+    :return: корректное дата, время
+    """
+    res = datetime.now().strftime('%Y-%m-%d %X')
+    return res
+
 
 default_path = os.path.dirname(os.path.abspath(__file__)).split('bot')[0] + 'bot'
 db_path = os.path.join(default_path, 'films.db')
@@ -10,32 +25,29 @@ db = peewee.SqliteDatabase(db_path, 'film.db')
 # Для отключения экранирования в таблицах
 my_json_dumps = functools.partial(json.dumps, ensure_ascii=False)
 
+logger = logging.getLogger('main.database.models.' + str(os.path.relpath(__file__)))
+sys.excepthook = any_exeption
+
 
 class ModelBase(peewee.Model):
     """Модель базы данных"""
-    created_at = peewee.DateTimeField(default=datetime.now().
-                                      strftime('%Y-%m-%d %X'))
+    created_at = peewee.DateTimeField(default=correct_date)
 
     class Meta:
         database = db
 
 
-class User(peewee.Model):
+class User(ModelBase):
     """Модель таблицы с пользователями"""
-    created_at = peewee.DateTimeField(default=datetime.now().
-                                      strftime('%Y-%m-%d %X'))
     user_id = peewee.IntegerField()
     user_name = peewee.TextField(null=True)
 
-    class Meta:
-        database = db
 
-
-class FilmsBase(peewee.Model):
+class FilmsBase(ModelBase):
     """Таблица для запроса поиска фильмов по названию"""
-    created_at = peewee.DateTimeField(default=datetime.now().strftime('%Y-%m-%d %X'))
     user = peewee.ForeignKeyField(User, backref='query')
     query = peewee.TextField()
+    film_id = peewee.IntegerField(null=True)
     internalNames = JSONField(null=True, json_dumps=my_json_dumps)
     name = peewee.TextField(null=True)
     alternativeName = peewee.TextField(null=True)
@@ -44,7 +56,7 @@ class FilmsBase(peewee.Model):
     genres = JSONField(null=True, json_dumps=my_json_dumps)
     countries = JSONField(null=True, json_dumps=my_json_dumps)
     releaseYears = JSONField(null=True, json_dumps=my_json_dumps)
-    film_id = peewee.IntegerField(null=True)
+    externalId = JSONField(null=True, json_dumps=my_json_dumps)
     names = JSONField(null=True, json_dumps=my_json_dumps)
     type = peewee.TextField(null=True)
     description = peewee.TextField(null=True)
@@ -67,15 +79,10 @@ class FilmsBase(peewee.Model):
     status = peewee.TextField(null=True)
     internalRating = JSONField(null=True, json_dumps=my_json_dumps)
     internalVotes = peewee.IntegerField(null=True)
-    externalId = JSONField(null=True, json_dumps=my_json_dumps)
-
-    class Meta:
-        database = db
 
 
-class Top100Films(peewee.Model):
+class Top100Films(ModelBase):
     """Таблица для хранения топ 100 фильмов Кинопоиска"""
-    created_at = peewee.DateTimeField(default=datetime.now().strftime('%Y-%m-%d %X'))
     film_id = peewee.IntegerField(null=True)
     name = peewee.TextField(null=True)
     alternativeName = peewee.TextField(null=True)
@@ -88,13 +95,9 @@ class Top100Films(peewee.Model):
     networks = peewee.TextField(null=True)
     videos = JSONField(null=True, json_dumps=my_json_dumps)
 
-    class Meta:
-        database = db
 
-
-class Find_Film_Param(peewee.Model):
+class Find_Film_Param(ModelBase):
     """Таблица найденных фильмов по параметрам"""
-    created_at = peewee.DateTimeField(default=datetime.now().strftime('%Y-%m-%d %X'))
     user = peewee.ForeignKeyField(User, backref='query')
     query = peewee.TextField()
     film_id = peewee.IntegerField(null=True)
@@ -153,13 +156,10 @@ class Find_Film_Param(peewee.Model):
     collections = JSONField(null=True, json_dumps=my_json_dumps)
     createdAt = JSONField(null=True, json_dumps=my_json_dumps)
 
-    class Meta:
-        database = db
-
 
 db.connect()
+logger.debug('БД была создана')
 db.create_tables([User, FilmsBase, Top100Films, Find_Film_Param])
 if __name__ == '__main__':
     print(default_path)
     print(db_path)
-    # print(os.path.expanduser(__file__).split())
