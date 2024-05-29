@@ -10,7 +10,7 @@ def_find_film = SiteApiInterface.film_finder()
 def_top_100_film = SiteApiInterface.top_100_film()
 def_find_film_param = SiteApiInterface.find_film_param()
 
-logger = logging.getLogger('main.site_api.' + str(os.path.relpath(__file__)))
+# logger = logging.getLogger('main.site_api.' + str(os.path.relpath(__file__)))
 
 if __name__ == '__main__':
     pass

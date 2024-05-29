@@ -1,3 +1,8 @@
+import logging
+import sys
+
+from config_data.logger_config import *
+import os.path
 from contextlib import suppress
 from typing import Generator
 
@@ -15,18 +20,24 @@ from tg_api.keyboards.inline.some_inline_kb import change_films_kb
 
 from typing import Type
 
+logger = logging.getLogger(f'main.tg_api.handlers.custom_handlers.{os.path.basename(__file__)}')
+sys.excepthook = any_exeption
+
 user_data = {}
 dict_with_films = {}
 
 
 def photo_finder(num: int, user_id: int, out_message_dict: dict) -> str:
     """Поиск фото в списке результатов поиска"""
-    print(out_message_dict[user_id][num]['poster'].get('previewUrl'))
+    logger.debug(f'{photo_finder.__name__} - начало работы')
+    logger.debug(f"{photo_finder.__name__} - {out_message_dict[user_id][num]['poster'].get('previewUrl')}")
+    logger.info(f'{photo_finder.__name__} - нашел фото')
     return out_message_dict[user_id][num]['poster'].get('previewUrl')
 
 
 def caption(num: int, user_id: int, out_message_dict: dict) -> str:
     """Генерация описание картинки"""
+    logger.debug(f'{caption.__name__} - начало поиска описания картинки')
     film_name = out_message_dict[user_id][num].get('name')
     alternative_name = out_message_dict[user_id][num].get('alternativeName')
     year = out_message_dict[user_id][num].get('year')
@@ -46,7 +57,6 @@ def caption(num: int, user_id: int, out_message_dict: dict) -> str:
                          f'<b>Рейтинг:</b>🏆{rating}\n'
                          f'Сериал\n'
                          f'Продолжительность серии: {series_length} минут')
-        return photo_caption
     else:
         photo_caption = (f'<b>{film_name}</b>\\<i>{alternative_name}</i>'
                          f'({year})\n'
@@ -55,7 +65,8 @@ def caption(num: int, user_id: int, out_message_dict: dict) -> str:
                          f'<b>Рейтинг:</b>🏆{rating}\n'
                          f'Фильм\n'
                          f'Продолжительность: {movie_length} минут')
-        return photo_caption
+    logger.info(f'{caption.__name__} - подготовил описание картинки')
+    return photo_caption
 
 
 def countries_list() -> Generator:
@@ -68,10 +79,11 @@ def countries_list() -> Generator:
 async def rez_finder(message: Message, state: FSMContext, new_state: State,
                      table: Type[FilmsBase | Top100Films | Find_Film_Param]):
     """Поиск фильмов и вывод результата в виде картинки с описанием и кнопками листания"""
-
+    logger.debug(f'{rez_finder.__name__} - начало работы функции показывающей результаты поиска')
     user_inf = message.from_user.id
     st_name = await state.get_state()
     try:
+        logger.debug(f'{rez_finder.__name__} - определяю необходимые настройки')
         if st_name == 'MovieSearch:choosing_film_name':
             old_elem = def_del_old_elem(db, user_inf, FilmsBase, User)
             response_list = def_find_film(message.text, limit_page=30)
@@ -82,7 +94,7 @@ async def rez_finder(message: Message, state: FSMContext, new_state: State,
                 await message.answer('А я не знаю такой фильм 🤖')
                 return
             else:
-                print(response_list)
+                logger.warning(f'{rez_finder.__name__} - {response_list}')
                 await message.answer('Что то пошло не так ! Буду разбираться', reply_markup=ReplyKeyboardRemove())
                 await message.answer_sticker('CAACAgIAAxkBAAELUIxlv4FmGKw0Z7rVlCfWSo1gTA_n1wACWQADJxRJC-OPDSX1raG1NAQ')
                 await state.clear()
@@ -95,14 +107,14 @@ async def rez_finder(message: Message, state: FSMContext, new_state: State,
                     out_list = create_list_for_find_film(None, response_list, None)
                     def_insert_data(db, table, out_list)
                 else:
-                    print(response_list)
+                    logger.warning(f'{rez_finder.__name__} - {response_list}')
                     await message.answer('Что то пошло не так ! Буду разбираться', reply_markup=ReplyKeyboardRemove())
                     await message.answer_sticker(
                         'CAACAgIAAxkBAAELUIxlv4FmGKw0Z7rVlCfWSo1gTA_n1wACWQADJxRJC-OPDSX1raG1NAQ')
                     await state.clear()
         elif st_name == 'MovieSearch:choosing_find_film_param':
             old_elem = def_del_old_elem(db, user_inf, Find_Film_Param, User)
-            print(user_data)
+            logger.debug(f'{rez_finder.__name__} - {user_data}')
             response_list = def_find_film_param(*user_data[user_inf])
             if isinstance(response_list, list) and len(response_list):
                 query_str = ','.join([el if el is not None else 'Все равно'
@@ -113,7 +125,7 @@ async def rez_finder(message: Message, state: FSMContext, new_state: State,
                 await message.answer('А я не знаю такой фильм 🤖')
                 return
             else:
-                print(response_list)
+                logger.warning(f'{rez_finder.__name__} - {response_list}')
                 await message.answer('Что то пошло не так ! Буду разбираться', reply_markup=ReplyKeyboardRemove())
                 await message.answer_sticker('CAACAgIAAxkBAAELUIxlv4FmGKw0Z7rVlCfWSo1gTA_n1wACWQADJxRJC-OPDSX1raG1NAQ')
                 await state.clear()
@@ -126,19 +138,21 @@ async def rez_finder(message: Message, state: FSMContext, new_state: State,
             dict_with_films[user_inf] = def_get_elem(db, user_inf, table, User)
         elif st_name == 'MovieSearch:choosing_top_100':
             dict_with_films[user_inf] = def_get_elem(db, user_inf, table, None)
+        logger.debug(f'{rez_finder.__name__} - подготовлены данные для ответа')
         await message.answer_photo(
             photo=photo_finder(num=0, user_id=user_inf, out_message_dict=dict_with_films),
             caption=caption(num=0, user_id=user_inf, out_message_dict=dict_with_films),
             reply_markup=change_films_kb(num=0, all_num=len(dict_with_films[user_inf])))
         await state.set_state(new_state)
     except ReadTimeout as exs:
-        print(f'{exs} - сайт не отвечает')
+        logger.exception('сайт не отвечает', exc_info=True)
         await message.answer('Упсссс...Сервер не отвечает', reply_markup=ReplyKeyboardRemove())
         await message.answer_sticker('CAACAgIAAxkBAAELUIxlv4FmGKw0Z7rVlCfWSo1gTA_n1wACWQADJxRJC-OPDSX1raG1NAQ')
 
 
 async def update_num_text(message: Message, new_value: int, user_id):
     """Обновление описания картинки"""
+    logger.debug(f'{update_num_text.__name__} - начало работы')
     with suppress(TelegramBadRequest):
         photo = InputMediaPhoto(
             media=photo_finder(num=new_value, user_id=user_id, out_message_dict=dict_with_films),
@@ -147,10 +161,12 @@ async def update_num_text(message: Message, new_value: int, user_id):
             media=photo,
             reply_markup=change_films_kb(num=new_value, all_num=len(dict_with_films[user_id]))
         )
+    logger.info(f'{update_num_text.__name__} - КОнец работы')
 
 
 async def callbacks_num(callback: CallbackQuery, state: FSMContext, new_state: State):
     """Кнопки колбэки"""
+    logger.debug(f'{callbacks_num.__name__} - начало работы')
     user_value = user_data.get(callback.from_user.id, 0)
     action = callback.data.split("_")[1]
 
@@ -164,6 +180,7 @@ async def callbacks_num(callback: CallbackQuery, state: FSMContext, new_state: S
                               callback.from_user.id)
     await callback.answer(' ')
     await state.set_state(new_state)
+    logger.info(f'{callbacks_num.__name__} - выполнил задачу')
 
 
 if __name__ == '__main__':

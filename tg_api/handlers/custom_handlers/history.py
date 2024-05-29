@@ -1,9 +1,18 @@
+import logging
+import os
+import sys
+
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message
+
+from config_data.logger_config import any_exeption
 from database.models.models import User
 
 from database.models.models import FilmsBase, Find_Film_Param
+
+logger = logging.getLogger(f'main.tg_api.handlers.custom_handlers.{os.path.basename(__file__)}')
+sys.excepthook = any_exeption
 
 router = Router()
 
@@ -12,10 +21,8 @@ router = Router()
 @router.message(Command('history'))
 async def history(message: Message):
     """Итория запросов по Боту"""
+    logger.debug(f'{history.__name__} - начало работы')
     await message.answer('Здесь покажу историю запросов по поиску фильмов')
-    value = User.select().where(User.user_id == message.from_user.id)
-    for el in value:
-        print(el.id, el.user_id, el.user_name)
     value = FilmsBase.select(FilmsBase.query).join(User).where(User.user_id == message.from_user.id)
     out_res = set(el.query for el in value)
     if len(out_res):
@@ -35,3 +42,4 @@ async def history(message: Message):
                                  .format(*el.split(',')))
     else:
         await message.answer('А вы еще не искали фильмы по параметрам')
+    logger.info(f'{history.__name__} - отработала хорошо')

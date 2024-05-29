@@ -1,5 +1,8 @@
 import asyncio
+import os.path
+import sys
 
+from config_data.logger_config import *
 from aiogram import Router, F, Bot
 
 from aiogram.filters import Command
@@ -17,6 +20,9 @@ from database.core import def_insert_data, def_get_elem
 
 import re
 
+logger = logging.getLogger(f'main.tg_api.handlers.custom_handlers.{os.path.basename(__file__)}')
+sys.excepthook = any_exeption
+
 router = Router()
 genres = ['боевик', 'комедия', 'мультфильм', 'мелодрама', 'семейный', 'аниме',
           'биография', 'вестерн', 'военный', 'детектив', 'детский', 'для взрослых',
@@ -30,6 +36,7 @@ countries = [el for el in countries_list()]
 @router.message(Command('find_param'))
 async def finder_film(message: Message, state: FSMContext):
     """Действие по нажатии кнопки поиск фильмов, отображение новых кнопок"""
+    logger.debug('Пользователь нажал кнопку поиска по параметрам')
     await message.answer('🤖 Сейчас будут предложены параметры поиска фильмов!', reply_markup=ReplyKeyboardRemove())
     await message.answer('Выберите, что будем искать?', reply_markup=film_type_kb())
     await state.set_state(MovieSearch.find_film_param)
@@ -38,18 +45,20 @@ async def finder_film(message: Message, state: FSMContext):
 @router.callback_query(MovieSearch.find_film_param, F.data.startswith('type'))
 async def film_types(callback: CallbackQuery, state: FSMContext, bot: Bot):
     """Выбор типа фильмов"""
+    logger.debug(f'{film_types.__name__} - начало работы функции')
     user_value = callback.from_user.id
     action = callback.data.split('_')[1]
     if action == 'None':
         action = None
     user_data[user_value] = [action, 2019, 2024, 0, 10, 0]
     await callback.answer(f'{callback.from_user.username} выбрал {action}')
-    print(user_value, user_data)
+    logger.debug(f'{user_value},{user_data}]')
     await bot.send_message(chat_id=callback.message.chat.id, text='Спасибо, переходим к следующему параметру')
     await asyncio.sleep(1)
     await bot.send_message(chat_id=callback.message.chat.id, text='Теперь выбираем год\n от 2019 до 2024',
                            reply_markup=year_change_kb())
     await state.set_state(MovieSearch.choosing_year)
+    logger.debug(f'{film_types.__name__} - конец работы функции')
 
 
 @router.message(MovieSearch.find_film_param, F.text)
@@ -79,7 +88,7 @@ async def manual_year(message: Message, state: FSMContext):
     """Ручной ввод даты выхода фильмов"""
     user_value = message.from_user.id
     res = re.findall(r'\d{4}', message.text)
-    print(res)
+    logger.debug(f'{manual_year.__name__} - {res}')
     if len(res):
         if len(res) > 1 and int(res[0]) <= int(res[1]) <= 2024:
             user_data[message.from_user.id][1] = '-'.join(res[0:2])
@@ -90,7 +99,7 @@ async def manual_year(message: Message, state: FSMContext):
             await message.answer('Теперь выбираем год\n от 2019 до 2024', reply_markup=year_change_kb())
             return
         del (user_data[message.from_user.id][2])
-        print(user_data)
+        logger.debug(f'{manual_year.__name__} - {user_data}')
         await message.answer(f"Итого: {user_data[user_value][1]}")
         await message.answer(text='Теперь введи нужный рейтинг?\n 0 - 10', reply_markup=rating_change_kb())
         await state.set_state(MovieSearch.choosing_rating)
@@ -103,7 +112,7 @@ async def year(callback: CallbackQuery, state: FSMContext):
     """Отработка выбора года фильмов"""
     user_value = callback.from_user.id
     action = callback.data.split('_')[1]
-    print(action)
+    logger.debug(f'{year.__name__} - {action}')
     # Значения прошлой итеррации
     value_l = user_data[user_value][1]
     value_r = user_data[user_value][2]
@@ -118,7 +127,7 @@ async def year(callback: CallbackQuery, state: FSMContext):
     elif action == 'None':
         user_data[user_value][1] = None
         del (user_data[user_value][2])
-        print(user_data)
+        logger.debug(f'{year.__name__} - {user_data}')
         await callback.message.edit_text(f"Итого: Все равно")
         await callback.message.answer(text='Теперь введи нужный рейтинг?\n 0 - 10', reply_markup=rating_change_kb())
         await state.set_state(MovieSearch.choosing_rating)
@@ -126,7 +135,7 @@ async def year(callback: CallbackQuery, state: FSMContext):
     elif action == 'finish':
         user_data[user_value][1] = '-'.join([str(user_data[user_value][1]), str(user_data[user_value][2])])
         del (user_data[user_value][2])
-        print(user_data)
+        logger.debug(f'{year.__name__} - {user_data}')
         await callback.message.edit_text(f"Итого: {user_data[user_value][1]}")
         await callback.message.answer(text='Теперь введи нужный рейтинг?\n 0 - 10', reply_markup=rating_change_kb())
         await state.set_state(MovieSearch.choosing_rating)
@@ -137,7 +146,7 @@ async def year(callback: CallbackQuery, state: FSMContext):
         user_data[user_value][1] = value_l
         user_data[user_value][2] = value_r
         await callback.answer('Не-а')
-    print(user_data)
+    logger.debug(f'{year.__name__} - {user_data}')
 
 
 @router.message(MovieSearch.choosing_rating, F.text)
@@ -151,7 +160,7 @@ async def rating_change(callback: CallbackQuery, state: FSMContext):
     """Выбираю рейтинги"""
     user_value = callback.from_user.id
     action = callback.data.split('_')[1]
-    print(action)
+    logger.debug(f'{rating_change.__name__} - {action}')
     # Значения прошлой итеррации
     value_l = user_data[user_value][2]
     value_r = user_data[user_value][3]
@@ -166,7 +175,7 @@ async def rating_change(callback: CallbackQuery, state: FSMContext):
     elif action == 'None':
         user_data[user_value][2] = None
         del (user_data[user_value][3])
-        print(user_data)
+        logger.debug(f'{rating_change.__name__} - {user_data}')
         await callback.message.edit_text(f"Итого: Все равно")
         await callback.message.answer(text=f'Теперь выбираем жанр?\n{genres[user_data[user_value][3]]}',
                                       reply_markup=genres_change_kb())
@@ -175,7 +184,7 @@ async def rating_change(callback: CallbackQuery, state: FSMContext):
     elif action == 'finish':
         user_data[user_value][2] = '-'.join([str(user_data[user_value][2]), str(user_data[user_value][3])])
         del (user_data[user_value][3])
-        print(user_data)
+        logger.debug(f'{rating_change.__name__} - {user_data}')
         await callback.message.edit_text(f"Итого: {user_data[user_value][2]}")
         await callback.message.answer(text=f'Теперь выбираем жанр?\n{genres[user_data[user_value][3]]}',
                                       reply_markup=genres_change_kb())
@@ -187,7 +196,7 @@ async def rating_change(callback: CallbackQuery, state: FSMContext):
         user_data[user_value][2] = value_l
         user_data[user_value][3] = value_r
         await callback.answer('Не-а')
-    print(user_data)
+    logger.debug(f'{rating_change.__name__} - {user_data}')
 
 
 @router.message(MovieSearch.choosing_genres, F.text)
@@ -201,7 +210,7 @@ async def genres_change(callback: CallbackQuery, state: FSMContext):
     """Выбираю жанры"""
     user_value = callback.from_user.id
     action = callback.data.split('_')[1]
-    print(action)
+    logger.debug(f'{genres_change.__name__} - {action}')
     # Значения прошлой итеррации
     value = user_data[user_value][3]
     if action == 'left':
@@ -210,7 +219,7 @@ async def genres_change(callback: CallbackQuery, state: FSMContext):
         user_data[user_value][3] += 1
     elif action == 'None':
         user_data[user_value][3] = None
-        print(user_data)
+        logger.debug(f'{genres_change.__name__} - {user_data}')
         await callback.message.edit_text(f"Итого: Все равно")
         await callback.message.answer(text='Теперь введи название страны?')
         await callback.message.answer(text='Введите название страны', reply_markup=countries_kb())
@@ -218,7 +227,7 @@ async def genres_change(callback: CallbackQuery, state: FSMContext):
         return
     elif action == 'finish':
         user_data[user_value][3] = genres[user_data[user_value][3]]
-        print(user_data)
+        logger.debug(f'{genres_change.__name__} - {user_data}')
         await callback.message.edit_text(f"Итого: {user_data[user_value][3]}")
         await callback.message.answer(text='Теперь введи название страны?')
         await callback.message.answer(text='Введите название страны', reply_markup=countries_kb())
@@ -229,7 +238,7 @@ async def genres_change(callback: CallbackQuery, state: FSMContext):
     else:
         user_data[user_value][3] = value
         await callback.answer('Не-а')
-    print(user_data)
+    logger.debug(f'{genres_change.__name__} - {user_data}')
 
 
 @router.callback_query(MovieSearch.choosing_country, F.data.startswith('countries'))
@@ -239,7 +248,7 @@ async def countries_choice_callback(callback: CallbackQuery, state: FSMContext, 
     user_inf = callback.from_user.id
     action = callback.data.split('_')[1]
     user_data[user_inf].append(None)
-    print(user_data)
+    logger.debug(f'{countries_choice_callback.__name__} - {user_data}')
     def_del_old_elem(db, user_inf, Find_Film_Param, User)
     await bot.send_message(chat_id=callback.message.chat.id, text='Вот все выбрали!')
     await bot.send_message(chat_id=callback.message.chat.id, text='Тип = {0}\n'
@@ -270,14 +279,14 @@ async def countries_choice_callback(callback: CallbackQuery, state: FSMContext, 
         elif isinstance(response_list, list):
             await bot.send_message(callback.message.chat.id, text='А я не знаю такой фильм 🤖')
         else:
-            print(response_list)
+            logger.debug(f'{countries_choice_callback.__name__} - {response_list}')
             await bot.send_message(callback.message.chat.id, text='Что то пошло не так ! Буду разбираться',
                                    reply_markup=ReplyKeyboardRemove())
             await bot.send_sticker(callback.message.chat.id,
                                    sticker='CAACAgIAAxkBAAELUIxlv4FmGKw0Z7rVlCfWSo1gTA_n1wACWQADJxRJC-OPDSX1raG1NAQ')
             await state.clear()
     except ReadTimeout as exs:
-        print(f'{exs} - сайт не отвечает')
+        logger.exception('сайт не отвечает', exc_info=True)
         await bot.send_message(callback.message.chat.id, text='Упсссс...Сервер не отвечает',
                                reply_markup=ReplyKeyboardRemove())
         await bot.send_message(callback.message.chat.id,
@@ -300,7 +309,7 @@ async def countries_choice(message: Message, state: FSMContext):
                               'Жанр = {3}\n'
                               'Страна= {4}\n'.format(*[el if el is not None else 'Все равно'
                                                        for el in user_data[user_value]]))
-    print(user_data)
+    logger.debug(f'{countries_choice.__name__} - {user_data}')
     await state.set_state(MovieSearch.choosing_find_film_param)
     await rez_finder(message, state, MovieSearch.changing_films_find_film_param, Find_Film_Param)
 

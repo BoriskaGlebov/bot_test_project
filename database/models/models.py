@@ -24,8 +24,7 @@ db_path = os.path.join(default_path, 'films.db')
 db = peewee.SqliteDatabase(db_path, 'film.db')
 # Для отключения экранирования в таблицах
 my_json_dumps = functools.partial(json.dumps, ensure_ascii=False)
-
-logger = logging.getLogger('main.database.models.' + str(os.path.relpath(__file__)))
+logger = logging.getLogger(f'main.database.models.{os.path.basename(__file__)}')
 sys.excepthook = any_exeption
 
 

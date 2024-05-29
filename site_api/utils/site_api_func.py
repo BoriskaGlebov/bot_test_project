@@ -9,7 +9,7 @@ from requests import get
 from site_api.settings.site_settings import headers_dict, status_code
 from site_api.utils.common_func import column_names
 
-logger = logging.getLogger('main.site_api.utils.' + str(os.path.relpath(__file__)))
+logger = logging.getLogger(f'main.site_api.utils.{os.path.basename(__file__)}')
 sys.excepthook = any_exeption
 
 

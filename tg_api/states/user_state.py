@@ -13,4 +13,6 @@ class MovieSearch(StatesGroup):
     choosing_rating = State()
     choosing_genres = State()
     choosing_country = State()
+    choosing_db = State()
+
 

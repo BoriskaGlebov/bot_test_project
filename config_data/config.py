@@ -1,3 +1,4 @@
+# Модуль получает токены бота и API Kinopoisk из файла .env
 import os
 from dotenv import load_dotenv, find_dotenv
 from pydantic import SecretStr, StrictStr

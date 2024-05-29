@@ -17,9 +17,9 @@ from database.models.models import *  # для тестов
 from site_api.core import *
 from database.utilits.common_func import create_list_for_find_film
 
-logger = logging.getLogger('main.database.utils.' + str(os.path.relpath(__file__)))
+logger = logging.getLogger(f'main.database.utilits.{os.path.basename(__file__)}')
 sys.excepthook = any_exeption
-logging.config.dictConfig(dict_config)
+# logging.config.dictConfig(dict_config) #только на момент тестирования функций нужно
 T = TypeVar('T')
 
 
@@ -117,7 +117,6 @@ def _del_instance(database: SqliteDatabase, user_id: int | None, model_film: T, 
             return result_db
 
 
-
 class CRUDInterface:
     """Создание, чтение, обновление, удаление данных в БД"""
 
@@ -157,11 +156,11 @@ class CRUDInterface:
 if __name__ == '__main__':
     user = _insert_single_user(User, 123, 'Test_User')
     print(user)
-    find_film = def_find_film('1+1')
-    ins_data = create_list_for_find_film(user, find_film, '1+1')
-    _insert_data(db, FilmsBase, ins_data)
-    retr_elem = _retrieve_elem(db, 123, FilmsBase, User)
-    pprint(retr_elem)
-    del_inst = _del_instance(db, 123, FilmsBase, User)
-    print(del_inst)
-    user.delete_instance(recursive=True)
+    # find_film = def_find_film('1+1')
+    # ins_data = create_list_for_find_film(user, find_film, '1+1')
+    # _insert_data(db, FilmsBase, ins_data)
+    # retr_elem = _retrieve_elem(db, 123, FilmsBase, User)
+    # pprint(retr_elem)
+    # del_inst = _del_instance(db, 123, FilmsBase, User)
+    # print(del_inst)
+    # user.delete_instance(recursive=True)
