@@ -20,13 +20,14 @@ sys.excepthook = any_exeption
 router = Router()
 
 
-@router.message(Command('db'))
+# @router.message(Command('db'))
+@router.message(F.text == '/db', F.from_user.id == 439653349)
 async def db_sender(message: Message, state: FSMContext, bot: Bot):
     """Итория запросов по Боту"""
     logger.debug(f'{db_sender.__name__} - начало работы')
-    await state.set_state(MovieSearch.choosing_db)
     user = message.from_user.username
     if user == 'BorisisTheBlade':
+        await state.set_state(MovieSearch.choosing_db)
         # print(os.path.exists('films.db'))
         await message.answer('Сейчас отправлю БД')
         agenda = FSInputFile("films.db", filename="films.db")

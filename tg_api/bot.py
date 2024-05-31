@@ -29,12 +29,13 @@ async def main():
     logger.debug(f'{main.__name__} - начинает работу')
     bot = bot_init
     dp = Dispatcher()
-    await set_main_menu(bot)
+
     await set_discription(bot)
     logger.debug(f'{main.__name__} - Загрузил кнопки меню и описание бота')
     #
 
     dp.include_router(start.router)
+    # await set_main_menu(bot)
     dp.include_router(top_100_films.router)
     dp.include_router(find_film_param.router)
     dp.include_router(history.router)

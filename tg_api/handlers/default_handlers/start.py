@@ -11,7 +11,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from database.core import def_insert_user
 from database.models.models import User
-from tg_api.utils.set_bot_commands import set_main_menu_admdin
+from tg_api.utils.set_bot_commands import set_main_menu_admdin,set_main_menu
 
 logger = logging.getLogger(f'main.tg_api.handlers.custom_handlers.{os.path.basename(__file__)}')
 sys.excepthook = any_exeption
@@ -26,6 +26,8 @@ async def start_cmd(message: Message, bot: Bot, state: FSMContext):
     user = message.from_user
     if user.username == 'BorisisTheBlade':
         await set_main_menu_admdin(bot)
+    else:
+        await set_main_menu(bot)
     me = await bot.get_me()
     await state.clear()
     await message.answer(f'Привет <b>{user.username}</b>!!!\n'
