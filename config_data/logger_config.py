@@ -7,7 +7,7 @@ from logging.handlers import TimedRotatingFileHandler
 import sys
 import string
 
-default_path = os.path.dirname(os.path.abspath(__file__)).split('bot')[0] + 'bot/'
+default_path = os.path.dirname(os.path.abspath(__file__)).split('bot')[0] + 'bot/app/'
 
 
 def any_exeption(type, values, traceback_info):
@@ -51,7 +51,7 @@ dict_config = {
     },
     "loggers": {
         "main": {
-            "level": "WARNING",
+            "level": "INFO",
             "handlers": ["file", "console"],
         },
 

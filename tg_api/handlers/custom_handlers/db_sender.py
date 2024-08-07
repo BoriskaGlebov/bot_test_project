@@ -30,7 +30,7 @@ async def db_sender(message: Message, state: FSMContext, bot: Bot):
         await state.set_state(MovieSearch.choosing_db)
         # print(os.path.exists('films.db'))
         await message.answer('Сейчас отправлю БД')
-        agenda = FSInputFile("films.db", filename="films.db")
+        agenda = FSInputFile("app/films.db", filename="films.db")
         await bot.send_document(message.chat.id, document=agenda)
     await state.clear()
 

@@ -19,7 +19,7 @@ def correct_date():
     return res
 
 
-default_path = os.path.dirname(os.path.abspath(__file__)).split('bot')[0] + 'bot'
+default_path = os.path.dirname(os.path.abspath(__file__)).split('bot')[0] + 'bot/app'
 db_path = os.path.join(default_path, 'films.db')
 db = peewee.SqliteDatabase(db_path, 'film.db')
 # Для отключения экранирования в таблицах
