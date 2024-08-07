@@ -13,10 +13,16 @@ services:
       - default
     volumes:
       - /home/user/Downloads/app:/bot/app
-      - some_vol:/bot/config_data
+      - ~/Downloads/app/config_data:/bot/config_data
+#    volumes:
+#      - type: bind
+#        source: /home/user/Downloads/app/var
+#        target: /bot/var
+#      - /home/user/Downloads/app:/bot/app
+#      - some_vol:/bot/config_data
 #
-volumes:
-  some_vol:
+#volumes:
+#  some_vol:
 
 networks:
   default:
