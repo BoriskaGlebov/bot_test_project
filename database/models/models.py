@@ -8,6 +8,7 @@ from playhouse.sqlite_ext import *
 
 import logging
 from config_data.logger_config import *
+from config_data.config import site_tg_settings
 
 
 def correct_date():
@@ -19,9 +20,12 @@ def correct_date():
     return res
 
 
-default_path = os.path.dirname(os.path.abspath(__file__)).split('bot')[0] + 'bot/app'
+# default_path = os.path.dirname(os.path.abspath(__file__)).split('bot')[0] + 'bot/app'
+default_path=os.path.join(site_tg_settings.directory,'db')
+if not os.path.isdir(default_path):
+    os.mkdir(default_path)
 db_path = os.path.join(default_path, 'films.db')
-db = peewee.SqliteDatabase(db_path, 'film.db')
+db = peewee.SqliteDatabase(db_path, 'films.db')
 # Для отключения экранирования в таблицах
 my_json_dumps = functools.partial(json.dumps, ensure_ascii=False)
 logger = logging.getLogger(f'main.database.models.{os.path.basename(__file__)}')

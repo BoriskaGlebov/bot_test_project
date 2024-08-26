@@ -2,14 +2,21 @@
 import logging
 import os
 from logging import config
+from config_data.config import site_tg_settings
 from logging import FileHandler
 from logging.handlers import TimedRotatingFileHandler
 import sys
 import string
 
-default_path = os.path.dirname(os.path.abspath(__file__)).split('bot')[0] + 'bot/app/'
+# from database.models.models import default_path
 
+# default_path = os.path.dirname(os.path.abspath(__file__)).split('bot')[0] + 'bot/app/'
 
+default_path=os.path.join(site_tg_settings.directory,'logger')
+if not os.path.isdir(default_path):
+    os.mkdir(default_path)
+
+# print(default_path)
 def any_exeption(type, values, traceback_info):
     """
     Функция логгирования неожиданных исключений
@@ -43,7 +50,7 @@ dict_config = {
             "class": "logging.FileHandler",
             "level": "DEBUG",
             "formatter": "base",
-            "filename": f'{default_path}logger.log',
+            "filename": f'{default_path}/logger.log',
             "mode": "a",
             "encoding": "utf-8",
         },

@@ -3,7 +3,7 @@ from config_data.config import site_tg_settings
 
 headers_dict: dict = {
     "accept": site_tg_settings.host_api,
-    "X-API-KEY": site_tg_settings.api_key.get_secret_value()
+    "X-API-KEY": site_tg_settings.api_key
 }
 
 status_code: dict = {200: 'Все хорошо',
