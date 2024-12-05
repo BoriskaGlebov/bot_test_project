@@ -1,5 +1,7 @@
 .*
 !.dockerignore
 !.gitignore
+!.env_template
+!.github
 *.db
 *.log
